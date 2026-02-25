@@ -132,25 +132,34 @@ def get_captured_pieces(board):
     
     # Calcular peças capturadas
     captured = {
-        'white_captured': [],  # Peças pretas capturadas pelas brancas
-        'black_captured': []   # Peças brancas capturadas pelas pretas
+        'white_captured': [],  # Peças que as BRANCAS capturaram (portanto, são peças PRETAS)
+        'black_captured': []   # Peças que as PRETAS capturaram (portanto, são peças BRANCAS)
     }
     
-    # Peças capturadas pelas brancas (peças pretas que faltam)
+    # DEBUG: Vamos imprimir para ver o que está acontecendo
+    print(f"DEBUG - Current pieces WHITE: {dict(current_pieces[chess.WHITE])}")
+    print(f"DEBUG - Current pieces BLACK: {dict(current_pieces[chess.BLACK])}")
+    
+    # Peças capturadas pelas BRANCAS (peças PRETAS que faltam)
     for piece_type, initial_count in initial_pieces.items():
-        if piece_type != chess.KING:
+        if piece_type != chess.KING:  # Rei nunca é capturado
             current_count = current_pieces[chess.BLACK].get(piece_type, 0)
             captured_count = initial_count - current_count
+            print(f"DEBUG - Black {chess.piece_name(piece_type)}: initial={initial_count}, current={current_count}, captured={captured_count}")
             for _ in range(captured_count):
                 captured['white_captured'].append(piece_to_svg[(chess.BLACK, piece_type)])
     
-    # Peças capturadas pelas pretas (peças brancas que faltam)
+    # Peças capturadas pelas PRETAS (peças BRANCAS que faltam)
     for piece_type, initial_count in initial_pieces.items():
         if piece_type != chess.KING:
             current_count = current_pieces[chess.WHITE].get(piece_type, 0)
             captured_count = initial_count - current_count
+            print(f"DEBUG - White {chess.piece_name(piece_type)}: initial={initial_count}, current={current_count}, captured={captured_count}")
             for _ in range(captured_count):
                 captured['black_captured'].append(piece_to_svg[(chess.WHITE, piece_type)])
+    
+    print(f"DEBUG - white_captured (peças pretas capturadas pelas brancas): {len(captured['white_captured'])} peças")
+    print(f"DEBUG - black_captured (peças brancas capturadas pelas pretas): {len(captured['black_captured'])} peças")
     
     return captured
 
@@ -219,10 +228,10 @@ def board_to_markdown(board):
     markdown += '<table>\n'
     markdown += '  <tr>\n'
     
-    # Left side - Pieces captured by Black (White pieces that Black took)
+    # Left side - Pieces captured by Black (peças BRANCAS que as PRETAS capturaram)
     markdown += '    <td valign="middle" align="center" width="120">\n'
     markdown += '      <strong>⚫ Pretas<br>capturaram</strong><br>\n'
-    if captured['black_captured']:
+    if captured['black_captured']:  # ← ISSO SÃO PEÇAS BRANCAS
         for svg_path in captured['black_captured']:
             markdown += f'      <img src="{svg_path}" width=30px><br>\n'
     else:
@@ -264,17 +273,14 @@ def board_to_markdown(board):
     
     markdown += '\n    </td>\n'
     
-    # Right side - Pieces captured by White (Black pieces that White took)
-    markdown += '    <td valign="middle" align="center" width="120">\n'
-    markdown += '      <strong>⚪ Brancas<br>capturaram</strong><br>\n'
-    if captured['white_captured']:
-        for svg_path in captured['white_captured']:
-            markdown += f'      <img src="{svg_path}" width=30px><br>\n'
-    else:
-        markdown += '      <em>nenhuma</em>\n'
-    markdown += '    </td>\n'
-    
-    markdown += '  </tr>\n'
-    markdown += '</table>\n'
+    # Right side - Pieces captured by White (peças PRETAS que as BRANCAS capturaram)
+markdown += '    <td valign="middle" align="center" width="120">\n'
+markdown += '      <strong>⚪ Brancas<br>capturaram</strong><br>\n'
+if captured['white_captured']:  # ← ISSO SÃO PEÇAS PRETAS
+    for svg_path in captured['white_captured']:
+        markdown += f'      <img src="{svg_path}" width=30px><br>\n'
+else:
+    markdown += '      <em>nenhuma</em>\n'
+markdown += '    </td>\n'
 
     return markdown
