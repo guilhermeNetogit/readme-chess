@@ -169,16 +169,25 @@ def captured_pieces_to_markdown(board):
     markdown += '    <td width="200" align="center"><strong>⚫ Pretas capturaram</strong><br>'
     for svg_path in captured['black_captured']:
         markdown += f'<img src="{svg_path}" width=30px> '
-    markdown += '</td>\n'
-    markdown += '    <td width="400" align="center"><em>(tabuleiro)</em></td>\n'
-    markdown += '    <td width="200" align="center"><strong>⚪ Brancas capturaram</strong><br>'
-    for svg_path in captured['white_captured']:
-        markdown += f'<img src="{svg_path}" width=30px> '
-    markdown += '</td>\n'
-    markdown += '  </tr>\n'
-    markdown += '</table>\n\n'
-    markdown += '</div>\n'
+        
+    markdown += '\n    </td>\n'
     
+    # Peças capturadas pelas brancas (lado direito - visão das brancas)
+    markdown += '    <td valign="middle" align="center" width="100">\n'
+    markdown += '      <strong>⚪ Brancas capturaram</strong><br>\n'
+    
+    # Adicionar as imagens das peças capturadas pelas brancas
+    if captured['white_captured']:
+        for svg_path in captured['white_captured']:
+            markdown += f'      <img src="{svg_path}" width=35px><br>\n'
+    else:
+        markdown += '      <em>nenhuma</em>\n'
+    
+    markdown += '    </td>\n'  # Fechamento correto da tag <td>
+    
+    markdown += '  </tr>\n'
+    markdown += '</table>\n'
+
     return markdown
 
 def board_to_markdown(board):
