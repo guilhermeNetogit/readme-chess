@@ -220,17 +220,17 @@ def board_to_markdown(board):
     markdown += '  <tr>\n'
     
     # Left side - Pieces captured by Black (White pieces that Black took)
-    markdown += '    <td valign="middle" align="center" width="100">\n'
-    markdown += '      <strong>⚫ Pretas capturaram</strong><br>\n'
+    markdown += '    <td valign="middle" align="center" width="120">\n'
+    markdown += '      <strong>⚫ Pretas<br>capturaram</strong><br>\n'
     if captured['black_captured']:
         for svg_path in captured['black_captured']:
-            markdown += f'      <img src="{svg_path}" width=35px><br>\n'
+            markdown += f'      <img src="{svg_path}" width=30px><br>\n'
     else:
         markdown += '      <em>nenhuma</em>\n'
     markdown += '    </td>\n'
     
     # Center - Chess board
-    markdown += '    <td valign="middle">\n\n'
+    markdown += '    <td valign="middle" align="center">\n\n'
     
     # Write header in Markdown format
     if board.turn == chess.BLACK:
@@ -252,7 +252,7 @@ def board_to_markdown(board):
             columns = reversed(columns)
 
         for elem in columns:
-            markdown += "<img src=\"{}\" width=50px> | ".format(images.get(elem, "???"))
+            markdown += "<img src=\"{}\" width=45px> | ".format(images.get(elem, "???"))
 
         markdown += "**" + str(9 - row) + "** |\n"
 
@@ -265,14 +265,14 @@ def board_to_markdown(board):
     markdown += '\n    </td>\n'
     
     # Right side - Pieces captured by White (Black pieces that White took)
-    markdown += '    <td valign="middle" align="center" width="100">\n'
-    markdown += '      <strong>⚪ Brancas capturaram</strong><br>\n'
+    markdown += '    <td valign="middle" align="center" width="120">\n'
+    markdown += '      <strong>⚪ Brancas<br>capturaram</strong><br>\n'
     if captured['white_captured']:
         for svg_path in captured['white_captured']:
-            markdown += f'      <img src="{svg_path}" width=35px><br>\n'
+            markdown += f'      <img src="{svg_path}" width=30px><br>\n'
     else:
         markdown += '      <em>nenhuma</em>\n'
-    markdown += '    </td>\n'  # ← ISSO ESTAVA FALTANDO!
+    markdown += '    </td>\n'
     
     markdown += '  </tr>\n'
     markdown += '</table>\n'
