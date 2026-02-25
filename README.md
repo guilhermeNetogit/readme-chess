@@ -16,12 +16,12 @@ It's your turn to play! Move a <!-- BEGIN TURN -->black<!-- END TURN --> piece.
 | **8** | <img src="img/black/rook.svg" width=45px> | <img src="img/black/knight.svg" width=45px> | <img src="img/black/bishop.svg" width=45px> | <img src="img/black/king.svg" width=45px> | <img src="img/blank.png" width=45px> | <img src="img/black/bishop.svg" width=45px> | <img src="img/black/knight.svg" width=45px> | <img src="img/black/rook.svg" width=45px> | **8** |
 |   | **H** | **G** | **F** | **E** | **D** | **C** | **B** | **A** |   |
 
----
-
 ### ⚔️ Peças Capturadas
 
 **⚪ Brancas:** <img src="img/black/pawn.svg" width=22px> <img src="img/black/queen.svg" width=22px>  &nbsp; | &nbsp; **⚫ Pretas:** <img src="img/white/pawn.svg" width=22px> <img src="img/white/pawn.svg" width=22px> <img src="img/white/queen.svg" width=22px> 
 <!-- END CHESS BOARD -->
+
+---
 
 **It's your turn to move! Choose one from the following table**
 <!-- BEGIN MOVES LIST -->
