@@ -97,6 +97,90 @@ def generate_moves_list(board):
 
     return markdown
 
+def get_captured_pieces(board):
+    """
+    Retorna um dicionário com as peças capturadas de cada cor
+    """
+    # Configuração inicial das peças
+    initial_pieces = {
+        chess.PAWN: 8, chess.KNIGHT: 2, chess.BISHOP: 2,
+        chess.ROOK: 2, chess.QUEEN: 1, chess.KING: 1
+    }
+    
+    # Contar peças atuais no tabuleiro
+    current_pieces = {chess.WHITE: defaultdict(int), chess.BLACK: defaultdict(int)}
+    for square in chess.SQUARES:
+        piece = board.piece_at(square)
+        if piece:
+            current_pieces[piece.color][piece.piece_type] += 1
+    
+    # Mapeamento de peças para SVGs
+    piece_to_svg = {
+        (chess.BLACK, chess.PAWN): "img/black/pawn.svg",
+        (chess.BLACK, chess.KNIGHT): "img/black/knight.svg",
+        (chess.BLACK, chess.BISHOP): "img/black/bishop.svg",
+        (chess.BLACK, chess.ROOK): "img/black/rook.svg",
+        (chess.BLACK, chess.QUEEN): "img/black/queen.svg",
+        (chess.BLACK, chess.KING): "img/black/king.svg",
+        (chess.WHITE, chess.PAWN): "img/white/pawn.svg",
+        (chess.WHITE, chess.KNIGHT): "img/white/knight.svg",
+        (chess.WHITE, chess.BISHOP): "img/white/bishop.svg",
+        (chess.WHITE, chess.ROOK): "img/white/rook.svg",
+        (chess.WHITE, chess.QUEEN): "img/white/queen.svg",
+        (chess.WHITE, chess.KING): "img/white/king.svg",
+    }
+    
+    # Calcular peças capturadas
+    captured = {
+        'white_captured': [],  # Peças pretas capturadas pelas brancas
+        'black_captured': []   # Peças brancas capturadas pelas pretas
+    }
+    
+    # Peças capturadas pelas brancas (peças pretas que faltam)
+    for piece_type, initial_count in initial_pieces.items():
+        if piece_type != chess.KING:
+            current_count = current_pieces[chess.BLACK].get(piece_type, 0)
+            captured_count = initial_count - current_count
+            for _ in range(captured_count):
+                captured['white_captured'].append(piece_to_svg[(chess.BLACK, piece_type)])
+    
+    # Peças capturadas pelas pretas (peças brancas que faltam)
+    for piece_type, initial_count in initial_pieces.items():
+        if piece_type != chess.KING:
+            current_count = current_pieces[chess.WHITE].get(piece_type, 0)
+            captured_count = initial_count - current_count
+            for _ in range(captured_count):
+                captured['black_captured'].append(piece_to_svg[(chess.WHITE, piece_type)])
+    
+    return captured
+
+def captured_pieces_to_markdown(board):
+    """
+    Gera o HTML para exibir as peças capturadas ao lado do tabuleiro
+    """
+    captured = get_captured_pieces(board)
+    
+    markdown = '\n<div align="center">\n\n'
+    markdown += '### ⚔️ Peças Capturadas\n\n'
+    
+    # Peças capturadas pelas pretas (lado esquerdo - visão das pretas)
+    markdown += '<table>\n'
+    markdown += '  <tr>\n'
+    markdown += '    <td width="200" align="center"><strong>⚫ Pretas capturaram</strong><br>'
+    for svg_path in captured['black_captured']:
+        markdown += f'<img src="{svg_path}" width=30px> '
+    markdown += '</td>\n'
+    markdown += '    <td width="400" align="center"><em>(tabuleiro)</em></td>\n'
+    markdown += '    <td width="200" align="center"><strong>⚪ Brancas capturaram</strong><br>'
+    for svg_path in captured['white_captured']:
+        markdown += f'<img src="{svg_path}" width=30px> '
+    markdown += '</td>\n'
+    markdown += '  </tr>\n'
+    markdown += '</table>\n\n'
+    markdown += '</div>\n'
+    
+    return markdown
+
 def board_to_markdown(board):
     board_list = [[item for item in line.split(' ')] for line in str(board).split('\n')]
     markdown = ""
@@ -119,6 +203,23 @@ def board_to_markdown(board):
         ".": "img/blank.png"
     }
 
+    # Get captured pieces
+    captured = get_captured_pieces(board)
+    
+    # Create a table with captured pieces on the sides
+    markdown += '<table>\n'
+    markdown += '  <tr>\n'
+    
+    # Left side - Pieces captured by Black (White pieces that Black took)
+    markdown += '    <td valign="middle" align="center" width="100">\n'
+    markdown += '      <strong>⚫ Pretas capturaram</strong><br>\n'
+    for svg_path in captured['black_captured']:
+        markdown += f'      <img src="{svg_path}" width=35px><br>\n'
+    markdown += '    </td>\n'
+    
+    # Center - Chess board
+    markdown += '    <td valign="middle">\n\n'
+    
     # Write header in Markdown format
     if board.turn == chess.BLACK:
         markdown += "|   | H | G | F | E | D | C | B | A |   |\n"
@@ -148,5 +249,17 @@ def board_to_markdown(board):
         markdown += "|   | **H** | **G** | **F** | **E** | **D** | **C** | **B** | **A** |   |\n"
     else:
         markdown += "|   | **A** | **B** | **C** | **D** | **E** | **F** | **G** | **H** |   |\n"
+    
+    markdown += '\n    </td>\n'
+    
+    # Right side - Pieces captured by White (Black pieces that White took)
+    markdown += '    <td valign="middle" align="center" width="100">\n'
+    markdown += '      <strong>⚪ Brancas capturaram</strong><br>\n'
+    for svg_path in captured['white_captured']:
+        markdown += f'      <img src="{svg_path}" width=35px><br>\n'
+    markdown += '    </td>\n'
+    
+    markdown += '  </tr>\n'
+    markdown += '</table>\n'
 
     return markdown
