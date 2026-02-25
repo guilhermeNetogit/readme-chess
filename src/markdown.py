@@ -204,91 +204,63 @@ def board_to_markdown(board):
     markdown = ""
 
     images = {
-        "r": "img/black/rook.svg",
-        "n": "img/black/knight.svg",
-        "b": "img/black/bishop.svg",
-        "q": "img/black/queen.svg",
-        "k": "img/black/king.svg",
-        "p": "img/black/pawn.svg",
-
-        "R": "img/white/rook.svg",
-        "N": "img/white/knight.svg",
-        "B": "img/white/bishop.svg",
-        "Q": "img/white/queen.svg",
-        "K": "img/white/king.svg",
-        "P": "img/white/pawn.svg",
-
+        "r": "img/black/rook.svg", "n": "img/black/knight.svg", "b": "img/black/bishop.svg",
+        "q": "img/black/queen.svg", "k": "img/black/king.svg", "p": "img/black/pawn.svg",
+        "R": "img/white/rook.svg", "N": "img/white/knight.svg", "B": "img/white/bishop.svg",
+        "Q": "img/white/queen.svg", "K": "img/white/king.svg", "P": "img/white/pawn.svg",
         ".": "img/blank.png"
     }
 
     # Get captured pieces
     captured = get_captured_pieces(board)
     
-    # Create a table with board on left and captured pieces on right
-    markdown += '<table>\n'
-    markdown += '  <tr>\n'
-    
-    # Left side - Chess board
-    markdown += '    <td valign="top">\n\n'
-    
-    # Write header in Markdown format
+    # TABULEIRO (Markdown puro - sem tabela HTML)
     if board.turn == chess.BLACK:
         markdown += "|   | H | G | F | E | D | C | B | A |   |\n"
     else:
         markdown += "|   | A | B | C | D | E | F | G | H |   |\n"
     markdown += "|---|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|:-:|\n"
 
-    # Get Rows
     rows = range(1, 9)
     if board.turn == chess.BLACK:
         rows = reversed(rows)
 
-    # Write board
     for row in rows:
         markdown += "| **" + str(9 - row) + "** | "
         columns = board_list[row - 1]
         if board.turn == chess.BLACK:
             columns = reversed(columns)
-
         for elem in columns:
             markdown += "<img src=\"{}\" width=45px> | ".format(images.get(elem, "???"))
-
         markdown += "**" + str(9 - row) + "** |\n"
 
-    # Write footer in Markdown format
     if board.turn == chess.BLACK:
-        markdown += "|   | **H** | **G** | **F** | **E** | **D** | **C** | **B** | **A** |   |\n"
+        markdown += "|   | **H** | **G** | **F** | **E** | **D** | **C** | **B** | **A** |   |\n\n"
     else:
-        markdown += "|   | **A** | **B** | **C** | **D** | **E** | **F** | **G** | **H** |   |\n"
+        markdown += "|   | **A** | **B** | **C** | **D** | **E** | **F** | **G** | **H** |   |\n\n"
     
-    markdown += '\n    </td>\n'
+    # PEÇAS CAPTURADAS (em linha única abaixo)
+    markdown += "---\n\n"
+    markdown += "### ⚔️ Peças Capturadas\n\n"
     
-    # Right side - Captured pieces (VERSÃO SIMPLIFICADA E CORRIGIDA)
-    markdown += '    <td valign="top" align="left" width="160" style="padding-left: 20px;">\n\n'
-    
-    # BRANCAS
-    markdown += '      **⚪ BRANCAS**  \n'
+    # Brancas capturaram (peças pretas)
+    markdown += "**⚪ Brancas:** "
     if captured['white_captured']:
         for svg_path in captured['white_captured']:
-            markdown += f'      <img src="{svg_path}" width=22px> '
+            markdown += f'<img src="{svg_path}" width=22px> '
     else:
-        markdown += '      _nenhuma_'
-    markdown += '\n\n      <br>\n\n'
+        markdown += "_nenhuma_"
     
-    # TÍTULO
-    markdown += '      **⚔️ CAPTURADAS**  \n\n      <br>\n\n'
+    markdown += " &nbsp; | &nbsp; "
     
-    # PRETAS
-    markdown += '      **⚫ PRETAS**  \n'
+    # Pretas capturaram (peças brancas)
+    markdown += "**⚫ Pretas:** "
     if captured['black_captured']:
         for svg_path in captured['black_captured']:
-            markdown += f'      <img src="{svg_path}" width=22px> '
+            markdown += f'<img src="{svg_path}" width=22px> '
     else:
-        markdown += '      _nenhuma_'
-    markdown += '\n'
+        markdown += "_nenhuma_"
     
-    markdown += '\n    </td>\n'
-    markdown += '  </tr>\n'
-    markdown += '</table>\n'
+    markdown += "\n"
 
     return markdown
