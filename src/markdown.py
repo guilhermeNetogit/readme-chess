@@ -263,28 +263,28 @@ def board_to_markdown(board):
     
     markdown += '\n    </td>\n'
     
-    # Right side - Captured pieces (simplificado)
-    markdown += '    <td valign="top" align="left" width="180" style="padding-left: 15px;">\n\n'
+    # Right side - Captured pieces (VERSÃO SIMPLIFICADA E CORRIGIDA)
+    markdown += '    <td valign="top" align="left" width="160" style="padding-left: 20px;">\n\n'
     
-    # White captured
-    markdown += '      **⚪ Brancas**<br>'
+    # BRANCAS
+    markdown += '      **⚪ BRANCAS**  \n'
     if captured['white_captured']:
         for svg_path in captured['white_captured']:
-            markdown += f'<img src="{svg_path}" width=22px> '
+            markdown += f'      <img src="{svg_path}" width=22px> '
     else:
-        markdown += '—'
-    markdown += '<br><br>\n'
+        markdown += '      _nenhuma_'
+    markdown += '\n\n      <br>\n\n'
     
-    # Title (simples)
-    markdown += '      **⚔️ CAPTURADAS**<br><br>\n'
+    # TÍTULO
+    markdown += '      **⚔️ CAPTURADAS**  \n\n      <br>\n\n'
     
-    # Black captured
-    markdown += '      **⚫ Pretas**<br>'
+    # PRETAS
+    markdown += '      **⚫ PRETAS**  \n'
     if captured['black_captured']:
         for svg_path in captured['black_captured']:
-            markdown += f'<img src="{svg_path}" width=22px> '
+            markdown += f'      <img src="{svg_path}" width=22px> '
     else:
-        markdown += '—'
+        markdown += '      _nenhuma_'
     markdown += '\n'
     
     markdown += '\n    </td>\n'
