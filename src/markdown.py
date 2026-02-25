@@ -222,8 +222,11 @@ def board_to_markdown(board):
     # Left side - Pieces captured by Black (White pieces that Black took)
     markdown += '    <td valign="middle" align="center" width="100">\n'
     markdown += '      <strong>⚫ Pretas capturaram</strong><br>\n'
-    for svg_path in captured['black_captured']:
-        markdown += f'      <img src="{svg_path}" width=35px><br>\n'
+    if captured['black_captured']:
+        for svg_path in captured['black_captured']:
+            markdown += f'      <img src="{svg_path}" width=35px><br>\n'
+    else:
+        markdown += '      <em>nenhuma</em>\n'
     markdown += '    </td>\n'
     
     # Center - Chess board
@@ -264,9 +267,12 @@ def board_to_markdown(board):
     # Right side - Pieces captured by White (Black pieces that White took)
     markdown += '    <td valign="middle" align="center" width="100">\n'
     markdown += '      <strong>⚪ Brancas capturaram</strong><br>\n'
-    for svg_path in captured['white_captured']:
-        markdown += f'      <img src="{svg_path}" width=35px><br>\n'
-    markdown += '    </td>\n'
+    if captured['white_captured']:
+        for svg_path in captured['white_captured']:
+            markdown += f'      <img src="{svg_path}" width=35px><br>\n'
+    else:
+        markdown += '      <em>nenhuma</em>\n'
+    markdown += '    </td>\n'  # ← ISSO ESTAVA FALTANDO!
     
     markdown += '  </tr>\n'
     markdown += '</table>\n'
