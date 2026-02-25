@@ -67,8 +67,6 @@ Have you spotted a bug? Something missing? Feel free to open an [issue](https://
 
 | Total moves |  User  |
 | :---------: | :----- |
-| 9 | [@guilhermeNetogit](https://github.com/guilhermeNetogit) |
-| 9 | [@arauj0duy](https://github.com/arauj0duy) |
 
 <!-- END TOP MOVES -->
 </details>
