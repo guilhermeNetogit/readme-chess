@@ -224,10 +224,12 @@ def board_to_markdown(board):
     # Get captured pieces
     captured = get_captured_pieces(board)
     
-    # Create a simple table just for the board
-    markdown += '<table align="center">\n'
+    # Create a table with board on left and captured pieces on right
+    markdown += '<table>\n'
     markdown += '  <tr>\n'
-    markdown += '    <td align="center">\n\n'
+    
+    # Left side - Chess board
+    markdown += '    <td valign="top">\n\n'
     
     # Write header in Markdown format
     if board.turn == chess.BLACK:
@@ -260,33 +262,33 @@ def board_to_markdown(board):
         markdown += "|   | **A** | **B** | **C** | **D** | **E** | **F** | **G** | **H** |   |\n"
     
     markdown += '\n    </td>\n'
-    markdown += '  </tr>\n'
-    markdown += '</table>\n\n'
-
-    # Add captured pieces section BELOW the board
-    markdown += '<div align="center">\n\n'
-    markdown += '### ⚔️ Peças Capturadas\n\n'
     
-    # White captured pieces (black pieces that White took)
+    # Right side - Captured pieces (organizado: Brancas em cima, título no meio, Pretas embaixo)
+    markdown += '    <td valign="middle" align="center" width="200" style="padding-left: 20px;">\n\n'
+    
+    # White captured pieces (EM CIMA)
     if captured['white_captured']:
-        markdown += '**⚪ Brancas capturaram:** '
+        markdown += '      **⚪ Brancas capturaram:**<br>'
         for svg_path in captured['white_captured']:
             markdown += f'<img src="{svg_path}" width=25px> '
+        markdown += '<br><br>\n'
+    else:
+        markdown += '      **⚪ Brancas:** *nenhuma*<br><br>\n'
     
-    # Separator
-    if captured['white_captured'] and captured['black_captured']:
-        markdown += '&nbsp;&nbsp;|&nbsp;&nbsp;'
+    # Title (NO MEIO)
+    markdown += '      ### ⚔️ Peças Capturadas\n\n'
     
-    # Black captured pieces (white pieces that Black took)
+    # Black captured pieces (EMBAIXO)
     if captured['black_captured']:
-        markdown += '**⚫ Pretas capturaram:** '
+        markdown += '      **⚫ Pretas capturaram:**<br>'
         for svg_path in captured['black_captured']:
             markdown += f'<img src="{svg_path}" width=25px> '
+        markdown += '\n'
+    else:
+        markdown += '      **⚫ Pretas:** *nenhuma*\n'
     
-    # If no captures yet
-    if not captured['white_captured'] and not captured['black_captured']:
-        markdown += '*Nenhuma peça capturada ainda*'
-    
-    markdown += '\n\n</div>\n'
+    markdown += '\n    </td>\n'
+    markdown += '  </tr>\n'
+    markdown += '</table>\n'
 
     return markdown
