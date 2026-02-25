@@ -23,8 +23,18 @@ def create_issue_link(source, dest_list):
     return ", ".join(ret)
 
 def generate_top_moves():
+    # Verifica se o arquivo existe, se não existir, cria com um dicionário vazio
+    if not os.path.exists("data/top_moves.txt"):
+        with open("data/top_moves.txt", 'w') as file:
+            file.write("{}")
+    
     with open("data/top_moves.txt", 'r') as file:
-        dictionary = ast.literal_eval(file.read())
+        contents = file.read()
+        # Se o arquivo estiver vazio, usa dicionário vazio
+        if not contents.strip():
+            dictionary = {}
+        else:
+            dictionary = ast.literal_eval(contents)
 
     markdown = "\n"
     markdown += "| Total moves |  User  |\n"
@@ -37,6 +47,9 @@ def generate_top_moves():
     return markdown + "\n"
 
 def generate_last_moves():
+    # Verifica se o arquivo existe
+    if not os.path.exists("data/last_moves.txt"):
+        return "\n| Move | Author |\n| :--: | :----- |\n| *Nenhum movimento ainda* |\n\n"
     markdown = "\n"
     markdown += "| Move | Author |\n"
     markdown += "| :--: | :----- |\n"
