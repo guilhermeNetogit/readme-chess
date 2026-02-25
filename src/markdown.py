@@ -92,8 +92,9 @@ def generate_moves_list(board):
     markdown += "|  FROM  | TO (Just click a link!) |\n"
     markdown += "| :----: | :---------------------- |\n"
 
-    for source,dest in sorted(moves_dict.items()):
-        markdown += "| **" + source + "** | " + create_issue_link(source, dest) + " |\n"
+    # CORREÇÃO AQUI: source é a casa de origem, destinations é o CONJUNTO de destinos
+    for source, destinations in sorted(moves_dict.items()):
+        markdown += "| **" + source + "** | " + create_issue_link(source, destinations) + " |\n"
 
     return markdown
 
