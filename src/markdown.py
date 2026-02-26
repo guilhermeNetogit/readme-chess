@@ -95,35 +95,30 @@ def generate_last_moves():
     if not os.path.exists("data/last_moves.txt"):
         return "\n| Move | Algebraic Notation | Author |\n| :--: | :----------------: | :----- |\n| *Nenhum movimento ainda* | | |\n\n"
     
-    # Pegar notação algébrica
+    # Pegar notação algébrica (já vem na ordem correta: 1. e4, 1... e5, 2. Nf3, etc.)
     algebraic_moves = get_algebraic_notation()
     
     markdown = "\n"
     markdown += "| Move | Algebraic Notation | Author |\n"
     markdown += "| :--: | :----------------: | :----- |\n"
 
-    counter = 0
-    lines = []
-
-    # Primeiro, ler todas as linhas do arquivo
+    # Ler todas as linhas do arquivo last_moves.txt
     with open("data/last_moves.txt", 'r') as file:
         lines = file.readlines()
     
-    # Agora percorrer do fim para o começo (mais recente primeiro)
-    for i in range(len(lines) - 1, -1, -1):
-        line = lines[i]
+    # Pegar as últimas N jogadas do arquivo (as mais recentes)
+    max_moves = settings['misc']['max_last_moves']
+    recent_lines = lines[-max_moves:]  # Pega as últimas N linhas
+    
+    # AGORA: Inverter a ordem das linhas para mostrar a MAIS RECENTE primeiro
+    for idx, line in enumerate(reversed(recent_lines)):
         parts = line.rstrip().split(':')
 
         if not ":" in line:
             continue
 
-        if counter >= settings['misc']['max_last_moves']:
-            break
-
-        counter += 1
-        
-        # Pegar notação algébrica correspondente
-        algebraic_index = len(algebraic_moves) - counter
+        # Pegar notação algébrica correspondente (do fim para o início)
+        algebraic_index = len(algebraic_moves) - 1 - idx
         algebraic = algebraic_moves[algebraic_index] if algebraic_index >= 0 and algebraic_index < len(algebraic_moves) else "—"
 
         match_obj = re.search('([A-H][1-8])([A-H][1-8])', line, re.I)
