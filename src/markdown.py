@@ -113,21 +113,20 @@ def generate_last_moves():
     max_moves = settings['misc']['max_last_moves']
     recent_moves = moves_lines[-max_moves:] if len(moves_lines) > max_moves else moves_lines
     
-    # IMPORTANTE: As jogadas em recent_moves estão na ordem do arquivo (mais antiga primeiro)
-    # Mas a notação algébrica também está na ordem do jogo (mais antiga primeiro)
-    # Então podemos casar diretamente por índice, DESDE QUE peguemos as últimas N da notação também
-    
     # Pegar as últimas N notações algébricas
     recent_algebraic = algebraic_moves[-len(recent_moves):] if len(algebraic_moves) >= len(recent_moves) else algebraic_moves
     
-    # Para cada jogada, usar a notação correspondente pelo índice
+    # INVERTER a notação algébrica para que a MAIS RECENTE fique no TOPO
+    recent_algebraic.reverse()
+    
+    # Para cada jogada, usar a notação correspondente
     for i, move_line in enumerate(recent_moves):
         parts = move_line.rstrip().split(':')
         
         if not ":" in move_line:
             continue
         
-        # Pegar notação algébrica correspondente (mesmo índice)
+        # Pegar notação algébrica correspondente (agora invertida)
         algebraic = recent_algebraic[i] if i < len(recent_algebraic) else "—"
         
         match_obj = re.search('([A-H][1-8])([A-H][1-8])', move_line, re.I)
