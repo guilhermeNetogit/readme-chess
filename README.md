@@ -52,7 +52,7 @@ Have you spotted a bug? Something missing? Feel free to open an [issue](https://
 
 
 <details>
-  <summary>Last 5 moves in this game</summary>
+  <summary>Last 10 moves in this game</summary>
 <!-- BEGIN LAST MOVES -->
 
 | Move | Algebraic Notation | Author |
