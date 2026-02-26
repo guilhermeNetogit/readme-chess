@@ -46,18 +46,69 @@ def generate_top_moves():
 
     return markdown + "\n"
 
+def get_algebraic_notation():
+    """
+    Extrai a notação algébrica das últimas jogadas do arquivo PGN
+    Retorna uma lista com as últimas N jogadas no formato: "5. c4", "5... e5", etc.
+    """
+    if not os.path.exists('games/current.pgn'):
+        return []
+    
+    try:
+        with open('games/current.pgn') as pgn_file:
+            game = chess.pgn.read_game(pgn_file)
+            if game is None:
+                return []
+            
+            # Extrair notação principal
+            board = game.board()
+            moves = []
+            
+            # Pular cabeçalhos do PGN
+            node = game
+            move_number = 1
+            
+            while node.variations:
+                next_node = node.variations[0]
+                move = next_node.move
+                
+                # Obter notação algébrica
+                san = board.san(move)
+                
+                # Determinar se é movimento das brancas ou pretas
+                if board.turn == chess.WHITE:  # Antes de fazer o movimento, turn = WHITE significa que é movimento das brancas
+                    moves.append(f"{move_number}. {san}")
+                else:
+                    moves.append(f"{move_number}... {san}")
+                    move_number += 1
+                
+                board.push(move)
+                node = next_node
+            
+            return moves[-settings['misc']['max_last_moves']:]  # Últimas N jogadas
+            
+    except Exception as e:
+        print(f"Erro ao ler notação algébrica: {e}")
+        return []
+
 def generate_last_moves():
-    # Verifica se o arquivo existe
     if not os.path.exists("data/last_moves.txt"):
-        return "\n| Move | Author |\n| :--: | :----- |\n| *Nenhum movimento ainda* |\n\n"
+        return "\n| Move | Algebraic | Author |\n| :--: | :-------: | :----- |\n| *Nenhum movimento ainda* | | |\n\n"
+    
+    # Pegar notação algébrica
+    algebraic_moves = get_algebraic_notation()
+    algebraic_index = 0
+    
     markdown = "\n"
-    markdown += "| Move | Author |\n"
-    markdown += "| :--: | :----- |\n"
+    markdown += "| Move | Algebraic | Author |\n"
+    markdown += "| :--: | :-------: | :----- |\n"
 
     counter = 0
 
     with open("data/last_moves.txt", 'r') as file:
-        for line in file.readlines():
+        lines = file.readlines()
+        # Inverter para mostrar do mais recente para o mais antigo
+        for line in reversed(lines):
             parts = line.rstrip().split(':')
 
             if not ":" in line:
@@ -67,15 +118,24 @@ def generate_last_moves():
                 break
 
             counter += 1
+            
+            # Pegar notação algébrica correspondente
+            algebraic = algebraic_moves[-(counter)] if counter <= len(algebraic_moves) else "—"
 
             match_obj = re.search('([A-H][1-8])([A-H][1-8])', line, re.I)
             if match_obj is not None:
                 source = match_obj.group(1).upper()
                 dest   = match_obj.group(2).upper()
-
-                markdown += "| `" + source + "` to `" + dest + "` | " + create_link(parts[1], "https://github.com/" + parts[1].lstrip()[1:]) + " |\n"
+                
+                # Se for captura, adicionar 'x' na notação
+                if 'x' in algebraic.lower():
+                    display_move = f"`{source} x {dest}`"
+                else:
+                    display_move = f"`{source} to {dest}`"
+                
+                markdown += f"| {display_move} | `{algebraic}` | {create_link(parts[1], 'https://github.com/' + parts[1].lstrip()[1:])} |\n"
             else:
-                markdown += "| `" + parts[0] + "` | " + create_link(parts[1], "https://github.com/" + parts[1].lstrip()[1:]) + " |\n"
+                markdown += f"| `{parts[0]}` | `{algebraic}` | {create_link(parts[1], 'https://github.com/' + parts[1].lstrip()[1:])} |\n"
 
     return markdown + "\n"
 
