@@ -95,7 +95,7 @@ def generate_last_moves():
     if not os.path.exists("data/last_moves.txt"):
         return "\n| Move | Algebraic Notation | Author |\n| :--: | :----------------: | :----- |\n| *Nenhum movimento ainda* | | |\n\n"
     
-    # Pegar notação algébrica (já vem na ordem correta: 1. e4, 1... e5, 2. Nf3, etc.)
+    # Pegar notação algébrica do PGN (já vem na ordem correta: 1. e4, 1... e5, etc.)
     algebraic_moves = get_algebraic_notation()
     
     markdown = "\n"
@@ -106,39 +106,29 @@ def generate_last_moves():
     with open("data/last_moves.txt", 'r') as file:
         lines = file.readlines()
     
-    # Filtrar apenas as jogadas (ignorar "Start game" por enquanto)
+    # Filtrar apenas as jogadas (ignorar "Start game")
     moves_lines = [line for line in lines if "Start game" not in line]
     
     # Pegar as últimas N jogadas (as mais recentes)
     max_moves = settings['misc']['max_last_moves']
     recent_moves = moves_lines[-max_moves:] if len(moves_lines) > max_moves else moves_lines
     
-    # Inverter a ordem para mostrar da MAIS RECENTE para a MAIS ANTIGA
-    recent_moves.reverse()
+    # IMPORTANTE: As jogadas em recent_moves estão na ordem do arquivo (mais antiga primeiro)
+    # Mas a notação algébrica também está na ordem do jogo (mais antiga primeiro)
+    # Então podemos casar diretamente por índice, DESDE QUE peguemos as últimas N da notação também
     
-    # Para cada jogada, encontrar a notação algébrica correspondente
-    # A notação algébrica está na ordem cronológica, então precisamos casar com as jogadas
+    # Pegar as últimas N notações algébricas
+    recent_algebraic = algebraic_moves[-len(recent_moves):] if len(algebraic_moves) >= len(recent_moves) else algebraic_moves
     
-    # Vamos criar um dicionário de jogadas para notação
-    move_to_algebraic = {}
-    
-    # Pegar todas as jogadas em ordem cronológica (do arquivo original)
-    all_moves_chrono = [line for line in moves_lines]
-    
-    # Associar cada jogada à sua notação (na mesma ordem)
-    for i, move_line in enumerate(all_moves_chrono):
-        if i < len(algebraic_moves):
-            move_to_algebraic[move_line.strip()] = algebraic_moves[i]
-    
-    # Mostrar as jogadas na ordem inversa (mais recente primeiro)
-    for move_line in recent_moves:
+    # Para cada jogada, usar a notação correspondente pelo índice
+    for i, move_line in enumerate(recent_moves):
         parts = move_line.rstrip().split(':')
         
         if not ":" in move_line:
             continue
         
-        # Pegar notação algébrica correspondente
-        algebraic = move_to_algebraic.get(move_line.strip(), "—")
+        # Pegar notação algébrica correspondente (mesmo índice)
+        algebraic = recent_algebraic[i] if i < len(recent_algebraic) else "—"
         
         match_obj = re.search('([A-H][1-8])([A-H][1-8])', move_line, re.I)
         if match_obj is not None:
