@@ -106,22 +106,50 @@ def generate_last_moves():
     with open("data/last_moves.txt", 'r') as file:
         lines = file.readlines()
     
-    # Pegar as últimas N jogadas do arquivo (as mais recentes)
-    max_moves = settings['misc']['max_last_moves']
-    recent_lines = lines[-max_moves:]  # Pega as últimas N linhas
+    # Remover linhas vazias e pular a primeira se for "Start game" para processamento especial
+    moves_list = []
+    start_game_line = None
     
-    # AGORA: Inverter a ordem das linhas para mostrar a MAIS RECENTE primeiro
-    for idx, line in enumerate(reversed(recent_lines)):
-        parts = line.rstrip().split(':')
-
-        if not ":" in line:
+    for line in lines:
+        if "Start game" in line:
+            start_game_line = line
+        else:
+            moves_list.append(line)
+    
+    # Pegar as últimas N jogadas (menos o Start game)
+    max_moves = settings['misc']['max_last_moves']
+    
+    # Se tiver Start game, reservamos uma linha para ele no final
+    if start_game_line:
+        max_moves = max_moves - 1
+    
+    # Pegar as últimas N jogadas do arquivo (as mais recentes)
+    recent_moves = moves_list[-max_moves:] if len(moves_list) > max_moves else moves_list
+    
+    # Para cada jogada, encontrar a notação algébrica correspondente
+    # A notação algébrica está na ordem correta (1. e4, 1... e5, etc.)
+    # Precisamos casar cada jogada com sua notação
+    
+    # Vamos criar um dicionário de jogadas para notação
+    move_to_algebraic = {}
+    alg_index = 0
+    
+    for move_line in moves_list:
+        if alg_index < len(algebraic_moves):
+            move_to_algebraic[move_line.strip()] = algebraic_moves[alg_index]
+            alg_index += 1
+    
+    # Mostrar as jogadas na ordem em que aconteceram (mais antiga primeiro)
+    for move_line in recent_moves:
+        parts = move_line.rstrip().split(':')
+        
+        if not ":" in move_line:
             continue
-
-        # Pegar notação algébrica correspondente (do fim para o início)
-        algebraic_index = len(algebraic_moves) - 1 - idx
-        algebraic = algebraic_moves[algebraic_index] if algebraic_index >= 0 and algebraic_index < len(algebraic_moves) else "—"
-
-        match_obj = re.search('([A-H][1-8])([A-H][1-8])', line, re.I)
+        
+        # Pegar notação algébrica correspondente
+        algebraic = move_to_algebraic.get(move_line.strip(), "—")
+        
+        match_obj = re.search('([A-H][1-8])([A-H][1-8])', move_line, re.I)
         if match_obj is not None:
             source = match_obj.group(1).upper()
             dest   = match_obj.group(2).upper()
@@ -129,9 +157,11 @@ def generate_last_moves():
             move_display = f"`{source} to {dest}`"
             
             markdown += f"| {move_display} | `{algebraic}` | {create_link(parts[1], 'https://github.com/' + parts[1].lstrip()[1:])} |\n"
-        else:
-            # Caso especial para "Start game"
-            markdown += f"| `{parts[0]}` | `{algebraic}` | {create_link(parts[1], 'https://github.com/' + parts[1].lstrip()[1:])} |\n"
+    
+    # Adicionar Start game no final (se existir)
+    if start_game_line:
+        parts = start_game_line.rstrip().split(':')
+        markdown += f"| `Start game` | — | {create_link(parts[1], 'https://github.com/' + parts[1].lstrip()[1:])} |\n"
 
     return markdown + "\n"
 
