@@ -85,7 +85,7 @@ def get_algebraic_notation():
                 board.push(move)
                 node = next_node
             
-            return moves[-settings['misc']['max_last_moves']:]  # Últimas N jogadas
+            return moves  # Retorna todas as jogadas
             
     except Exception as e:
         print(f"Erro ao ler notação algébrica: {e}")
@@ -93,15 +93,14 @@ def get_algebraic_notation():
 
 def generate_last_moves():
     if not os.path.exists("data/last_moves.txt"):
-        return "\n| Move | Algebraic | Author |\n| :--: | :-------: | :----- |\n| *Nenhum movimento ainda* | | |\n\n"
+        return "\n| Move | Algebraic Notation | Author |\n| :--: | :----------------: | :----- |\n| *Nenhum movimento ainda* | | |\n\n"
     
     # Pegar notação algébrica
     algebraic_moves = get_algebraic_notation()
-    algebraic_index = 0
     
     markdown = "\n"
-    markdown += "| Move | Algebraic | Author |\n"
-    markdown += "| :--: | :-------: | :----- |\n"
+    markdown += "| Move | Algebraic Notation | Author |\n"
+    markdown += "| :--: | :----------------: | :----- |\n"
 
     counter = 0
 
@@ -119,7 +118,7 @@ def generate_last_moves():
 
             counter += 1
             
-            # Pegar notação algébrica correspondente
+            # Pegar notação algébrica correspondente (do fim para o início)
             algebraic = algebraic_moves[-(counter)] if counter <= len(algebraic_moves) else "—"
 
             match_obj = re.search('([A-H][1-8])([A-H][1-8])', line, re.I)
@@ -127,13 +126,10 @@ def generate_last_moves():
                 source = match_obj.group(1).upper()
                 dest   = match_obj.group(2).upper()
                 
-                # Se for captura, adicionar 'x' na notação
-                if 'x' in algebraic.lower():
-                    display_move = f"`{source} x {dest}`"
-                else:
-                    display_move = f"`{source} to {dest}`"
+                # Formato da jogada (igual ao que você já tem)
+                move_display = f"`{source} to {dest}`"
                 
-                markdown += f"| {display_move} | `{algebraic}` | {create_link(parts[1], 'https://github.com/' + parts[1].lstrip()[1:])} |\n"
+                markdown += f"| {move_display} | `{algebraic}` | {create_link(parts[1], 'https://github.com/' + parts[1].lstrip()[1:])} |\n"
             else:
                 markdown += f"| `{parts[0]}` | `{algebraic}` | {create_link(parts[1], 'https://github.com/' + parts[1].lstrip()[1:])} |\n"
 
