@@ -103,35 +103,40 @@ def generate_last_moves():
     markdown += "| :--: | :----------------: | :----- |\n"
 
     counter = 0
+    lines = []
 
+    # Primeiro, ler todas as linhas do arquivo
     with open("data/last_moves.txt", 'r') as file:
         lines = file.readlines()
-        # Inverter para mostrar do mais recente para o mais antigo
-        for line in reversed(lines):
-            parts = line.rstrip().split(':')
+    
+    # Agora percorrer do fim para o começo (mais recente primeiro)
+    for i in range(len(lines) - 1, -1, -1):
+        line = lines[i]
+        parts = line.rstrip().split(':')
 
-            if not ":" in line:
-                continue
+        if not ":" in line:
+            continue
 
-            if counter >= settings['misc']['max_last_moves']:
-                break
+        if counter >= settings['misc']['max_last_moves']:
+            break
 
-            counter += 1
+        counter += 1
+        
+        # Pegar notação algébrica correspondente
+        algebraic_index = len(algebraic_moves) - counter
+        algebraic = algebraic_moves[algebraic_index] if algebraic_index >= 0 and algebraic_index < len(algebraic_moves) else "—"
+
+        match_obj = re.search('([A-H][1-8])([A-H][1-8])', line, re.I)
+        if match_obj is not None:
+            source = match_obj.group(1).upper()
+            dest   = match_obj.group(2).upper()
             
-            # Pegar notação algébrica correspondente (do fim para o início)
-            algebraic = algebraic_moves[-(counter)] if counter <= len(algebraic_moves) else "—"
-
-            match_obj = re.search('([A-H][1-8])([A-H][1-8])', line, re.I)
-            if match_obj is not None:
-                source = match_obj.group(1).upper()
-                dest   = match_obj.group(2).upper()
-                
-                # Formato da jogada (igual ao que você já tem)
-                move_display = f"`{source} to {dest}`"
-                
-                markdown += f"| {move_display} | `{algebraic}` | {create_link(parts[1], 'https://github.com/' + parts[1].lstrip()[1:])} |\n"
-            else:
-                markdown += f"| `{parts[0]}` | `{algebraic}` | {create_link(parts[1], 'https://github.com/' + parts[1].lstrip()[1:])} |\n"
+            move_display = f"`{source} to {dest}`"
+            
+            markdown += f"| {move_display} | `{algebraic}` | {create_link(parts[1], 'https://github.com/' + parts[1].lstrip()[1:])} |\n"
+        else:
+            # Caso especial para "Start game"
+            markdown += f"| `{parts[0]}` | `{algebraic}` | {create_link(parts[1], 'https://github.com/' + parts[1].lstrip()[1:])} |\n"
 
     return markdown + "\n"
 
@@ -309,8 +314,8 @@ def board_to_markdown(board):
         markdown += "|   | **A** | **B** | **C** | **D** | **E** | **F** | **G** | **H** |   |\n\n"
     
     # PEÇAS CAPTURADAS (em linha única abaixo)
-    markdown += "---\n\n"
-    markdown += "### ⚔️ Peças Capturadas\n\n"
+    markdown += "#\n"
+    markdown += "### ⚔️ Peças Capturadas\n"
     
     # Brancas capturaram (peças pretas)
     markdown += "**⚪ Brancas:** "
