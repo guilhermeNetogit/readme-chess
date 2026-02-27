@@ -95,56 +95,47 @@ def generate_last_moves():
     if not os.path.exists("data/last_moves.txt"):
         return "\n| Move | Algebraic Notation | Author |\n| :--: | :----------------: | :----- |\n| *Nenhum movimento ainda* | | |\n\n"
     
-    # Pegar notação algébrica do PGN
+    # Pegar notação algébrica
     algebraic_moves = get_algebraic_notation()
     
     markdown = "\n"
     markdown += "| Move | Algebraic Notation | Author |\n"
     markdown += "| :--: | :----------------: | :----- |\n"
 
-    # Ler todas as linhas do arquivo last_moves.txt
+    # Ler last_moves.txt
     with open("data/last_moves.txt", 'r') as file:
         lines = file.readlines()
     
-    # Filtrar apenas as jogadas (ignorar Start game)
-    moves_lines = []
-    
+    # Filtrar jogadas (ignorar Start game)
+    jogadas = []
     for line in lines:
         if "Start game" not in line:
-            moves_lines.append(line.strip())
+            jogadas.append(line.strip())
     
-    # IMPORTANTE: NÃO INVERTER MAIS!
-    # moves_lines está na ordem: PRIMEIRO o mais antigo, ÚLTIMO o mais recente
-    # Queremos mostrar do MAIS RECENTE primeiro, então pegamos do final
-    moves_lines = moves_lines  # Mantém ordem original
-    
-    # Pegar as últimas N jogadas (do final da lista)
+    # Pegar as últimas N jogadas (as mais recentes)
     max_moves = settings['misc']['max_last_moves']
-    recent_moves = moves_lines[-max_moves:] if len(moves_lines) > max_moves else moves_lines
+    ultimas_jogadas = jogadas[-max_moves:]  # Pega do final
     
-    # Inverter a ordem para mostrar do mais recente primeiro
-    recent_moves.reverse()
+    # Inverter para mostrar da MAIS RECENTE para a MAIS ANTIGA
+    ultimas_jogadas.reverse()
     
-    # Pegar as últimas N notações e NÃO inverter (já estão na ordem correta)
-    recent_algebraic = algebraic_moves[-len(recent_moves):]
-    # NÃO fazer reverse aqui!
+    # Pegar as últimas N notações (também do final)
+    ultimas_notacoes = algebraic_moves[-len(ultimas_jogadas):]
     
-    # Mostrar as jogadas
-    for i, move_line in enumerate(recent_moves):
-        if not move_line or ":" not in move_line:
+    # NÃO inverter as notações! Elas já estão na ordem correta (mais recente no final)
+    # Mas como vamos mostrar da mais recente primeiro, precisamos inverter as notações
+    ultimas_notacoes.reverse()
+    
+    # Mostrar
+    for i, jogada in enumerate(ultimas_jogadas):
+        if ":" not in jogada:
             continue
             
-        parts = move_line.split(':')
-        if len(parts) < 2:
-            continue
-            
+        parts = jogada.split(':')
         move_code = parts[0].strip()
         author = parts[1].strip()
         
-        # Pegar notação correspondente
-        algebraic = recent_algebraic[i] if i < len(recent_algebraic) else "—"
-        
-        # Formatar movimento para exibição
+        # Formatar movimento
         match_obj = re.search('([A-H][1-8])([A-H][1-8])', move_code, re.I)
         if match_obj:
             source = match_obj.group(1).upper()
@@ -153,8 +144,15 @@ def generate_last_moves():
         else:
             move_display = f"`{move_code}`"
         
-        markdown += f"| {move_display} | `{algebraic}` | {create_link(author, 'https://github.com/' + author[1:])} |\n"
-
+        # Pegar notação
+        notacao = ultimas_notacoes[i] if i < len(ultimas_notacoes) else "—"
+        
+        markdown += f"| {move_display} | `{notacao}` | {create_link(author, 'https://github.com/' + author[1:])} |\n"
+    
+    # Debug opcional (comente se não quiser)
+    # print(f"Jogadas: {ultimas_jogadas}")
+    # print(f"Notações: {ultimas_notacoes}")
+    
     return markdown + "\n"
 
 def generate_moves_list(board):
