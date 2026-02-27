@@ -112,22 +112,25 @@ def generate_last_moves():
         if "Start game" not in line:
             jogadas.append(line.strip())
     
-    # Pegar as últimas N jogadas (as mais recentes)
+    # Pegar as últimas N jogadas
     max_moves = settings['misc']['max_last_moves']
     ultimas_jogadas = jogadas[-max_moves:]  # Pega do final
     
-    # Inverter para mostrar da MAIS RECENTE para a MAIS ANTIGA
-    ultimas_jogadas.reverse()
+    # Guardar as jogadas na ordem original (para usar como referência)
+    jogadas_ordem_original = ultimas_jogadas.copy()
     
-    # Pegar as últimas N notações (também do final)
+    # Pegar as últimas N notações
     ultimas_notacoes = algebraic_moves[-len(ultimas_jogadas):]
     
-    # NÃO inverter as notações! Elas já estão na ordem correta (mais recente no final)
-    # Mas como vamos mostrar da mais recente primeiro, precisamos inverter as notações
-    ultimas_notacoes.reverse()
+    # NÃO inverter as notações (já estão corretas)
     
-    # Mostrar
-    for i, jogada in enumerate(ultimas_jogadas):
+    # Mostrar as jogadas na ordem INVERSA (mais recente primeiro)
+    # Mas manter as notações na ordem correta
+    for i in range(len(ultimas_jogadas)):
+        # Pegar a jogada do FINAL para o INÍCIO (para inverter a coluna Move)
+        jogada = jogadas_ordem_original[-(i+1)]
+        notacao = ultimas_notacoes[i]  # Notação na ordem correta
+        
         if ":" not in jogada:
             continue
             
@@ -144,14 +147,7 @@ def generate_last_moves():
         else:
             move_display = f"`{move_code}`"
         
-        # Pegar notação
-        notacao = ultimas_notacoes[i] if i < len(ultimas_notacoes) else "—"
-        
         markdown += f"| {move_display} | `{notacao}` | {create_link(author, 'https://github.com/' + author[1:])} |\n"
-    
-    # Debug opcional (comente se não quiser)
-    # print(f"Jogadas: {ultimas_jogadas}")
-    # print(f"Notações: {ultimas_notacoes}")
     
     return markdown + "\n"
 
