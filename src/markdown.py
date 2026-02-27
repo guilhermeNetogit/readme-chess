@@ -106,14 +106,13 @@ def generate_last_moves():
     with open("data/last_moves.txt", 'r') as file:
         lines = file.readlines()
     
-    # Filtrar apenas as jogadas (ignorar Start game completamente)
+    # Filtrar apenas as jogadas (ignorar Start game)
     moves_lines = []
     
     for line in lines:
         if "Start game" not in line:
             moves_lines.append(line.strip())
     
-    # moves_lines está na ordem: PRIMEIRO o mais antigo, ÚLTIMO o mais recente
     # Inverter para mostrar do mais recente primeiro
     moves_lines.reverse()
     
@@ -121,12 +120,15 @@ def generate_last_moves():
     max_moves = settings['misc']['max_last_moves']
     recent_moves = moves_lines[:max_moves]
     
-    # Pegar as últimas N notações e inverter para casar com recent_moves
+    # Pegar as últimas N notações e inverter
     recent_algebraic = algebraic_moves[-len(recent_moves):]
     recent_algebraic.reverse()
     
-    # Mostrar as jogadas
+    # Mostrar as jogadas em Markdown PURO (sem HTML)
     for i, move_line in enumerate(recent_moves):
+        if not move_line or ":" not in move_line:
+            continue
+            
         parts = move_line.split(':')
         if len(parts) < 2:
             continue
@@ -146,6 +148,7 @@ def generate_last_moves():
         else:
             move_display = f"`{move_code}`"
         
+        # LINHA CRÍTICA: Markdown puro, sem tags HTML
         markdown += f"| {move_display} | `{algebraic}` | {create_link(author, 'https://github.com/' + author[1:])} |\n"
 
     return markdown + "\n"
