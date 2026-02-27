@@ -91,6 +91,29 @@ def get_algebraic_notation():
         print(f"Erro ao ler notação algébrica: {e}")
         return []
 
+def get_game_start_date():
+    """
+    Extrai a data de início do jogo do arquivo PGN
+    Retorna a data no formato: YYYY.MM.DD
+    """
+    if not os.path.exists('games/current.pgn'):
+        return None
+    
+    try:
+        with open('games/current.pgn') as pgn_file:
+            # Ler apenas as primeiras linhas (cabeçalhos)
+            for _ in range(10):  # Lê até 10 linhas para encontrar a data
+                line = pgn_file.readline()
+                if line.startswith('[Date '):
+                    # Extrair a data entre aspas
+                    match = re.search(r'"([^"]+)"', line)
+                    if match:
+                        return match.group(1)
+            return None
+    except Exception as e:
+        print(f"Erro ao ler data do PGN: {e}")
+        return None
+
 def generate_last_moves():
     if not os.path.exists("data/last_moves.txt"):
         return "\n| Move | Algebraic Notation | Author |\n| :--: | :----------------: | :----- |\n| *Nenhum movimento ainda* | | |\n\n"
@@ -116,6 +139,7 @@ def generate_last_moves():
     
     # Pegar as últimas N jogadas (as mais recentes)
     max_moves = settings['misc']['max_last_moves']
+
     recent_moves = moves_lines[:max_moves] if len(moves_lines) > max_moves else moves_lines
     
     # CRIAR DICIONÁRIO: mapeia cada movimento para sua notação
@@ -152,6 +176,31 @@ def generate_last_moves():
             move_display = f"`{move_code}`"
         
         markdown += f"| {move_display} | `{algebraic}` | {create_link(author, 'https://github.com/' + author[1:])} |\n"
+
+        # Adicionar Start game no final com a data
+        # Procurar a linha do Start game no arquivo original
+        with open("data/last_moves.txt", 'r') as file:
+            all_lines = file.readlines()
+    
+    start_game_line = None
+    for line in all_lines:
+        if "Start game" in line:
+            start_game_line = line.strip()
+            break
+    
+    if start_game_line:
+        parts = start_game_line.split(':')
+        if len(parts) >= 2:
+            author = parts[1].strip()
+            
+            # Pegar a data do início do jogo
+            start_date = get_game_start_date()
+            if start_date:
+                date_display = f"{start_date}"
+            else:
+                date_display = "—"
+            
+            markdown += f"| `Start game` | `{date_display}` | {create_link(author, 'https://github.com/' + author[1:])} |\n"
 
     return markdown + "\n"
 
