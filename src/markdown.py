@@ -95,41 +95,44 @@ def generate_last_moves():
     if not os.path.exists("data/last_moves.txt"):
         return "\n| Move | Algebraic Notation | Author |\n| :--: | :----------------: | :----- |\n| *Nenhum movimento ainda* | | |\n\n"
     
-    # Pegar notação algébrica
+    # Pegar notação algébrica do PGN
     algebraic_moves = get_algebraic_notation()
     
     markdown = "\n"
     markdown += "| Move | Algebraic Notation | Author |\n"
     markdown += "| :--: | :----------------: | :----- |\n"
 
-    # Ler last_moves.txt
+    # Ler todas as linhas do arquivo last_moves.txt
     with open("data/last_moves.txt", 'r') as file:
         lines = file.readlines()
     
-    # Filtrar jogadas (ignorar Start game)
+    # Filtrar apenas as jogadas (ignorar Start game)
     jogadas = []
     for line in lines:
         if "Start game" not in line:
             jogadas.append(line.strip())
     
-    # Pegar as últimas N jogadas
+    # Pegar as últimas N jogadas (as mais recentes)
     max_moves = settings['misc']['max_last_moves']
-    ultimas_jogadas = jogadas[-max_moves:]  # Pega do final
+    ultimas_jogadas = jogadas[-max_moves:]
     
-    # Guardar as jogadas na ordem original (para usar como referência)
-    jogadas_ordem_original = ultimas_jogadas.copy()
+    # AGORA A CORREÇÃO: Vamos criar duas listas separadas
+    jogadas_para_mostrar = []
+    notacoes_para_mostrar = []
     
-    # Pegar as últimas N notações
+    # Pegar as últimas N notações (na ordem do PGN)
     ultimas_notacoes = algebraic_moves[-len(ultimas_jogadas):]
     
-    # NÃO inverter as notações (já estão corretas)
+    # Inverter a ordem das jogadas (para mostrar mais recente primeiro)
+    jogadas_invertidas = list(reversed(ultimas_jogadas))
     
-    # Mostrar as jogadas na ordem INVERSA (mais recente primeiro)
-    # Mas manter as notações na ordem correta
-    for i in range(len(ultimas_jogadas)):
-        # Pegar a jogada do FINAL para o INÍCIO (para inverter a coluna Move)
-        jogada = jogadas_ordem_original[-(i+1)]
-        notacao = ultimas_notacoes[i]  # Notação na ordem correta
+    # Manter as notações na ordem original (já estão corretas)
+    notacoes_ordem_original = ultimas_notacoes
+    
+    # Mostrar lado a lado
+    for i in range(len(jogadas_invertidas)):
+        jogada = jogadas_invertidas[i]
+        notacao = notacoes_ordem_original[i]
         
         if ":" not in jogada:
             continue
