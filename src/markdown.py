@@ -113,18 +113,23 @@ def generate_last_moves():
         if "Start game" not in line:
             moves_lines.append(line.strip())
     
-    # Inverter para mostrar do mais recente primeiro
-    moves_lines.reverse()
+    # IMPORTANTE: NÃO INVERTER MAIS!
+    # moves_lines está na ordem: PRIMEIRO o mais antigo, ÚLTIMO o mais recente
+    # Queremos mostrar do MAIS RECENTE primeiro, então pegamos do final
+    moves_lines = moves_lines  # Mantém ordem original
     
-    # Pegar as últimas N jogadas
+    # Pegar as últimas N jogadas (do final da lista)
     max_moves = settings['misc']['max_last_moves']
-    recent_moves = moves_lines[:max_moves]
+    recent_moves = moves_lines[-max_moves:] if len(moves_lines) > max_moves else moves_lines
     
-    # Pegar as últimas N notações e inverter
+    # Inverter a ordem para mostrar do mais recente primeiro
+    recent_moves.reverse()
+    
+    # Pegar as últimas N notações e NÃO inverter (já estão na ordem correta)
     recent_algebraic = algebraic_moves[-len(recent_moves):]
-    recent_algebraic.reverse()
+    # NÃO fazer reverse aqui!
     
-    # Mostrar as jogadas em Markdown PURO (sem HTML)
+    # Mostrar as jogadas
     for i, move_line in enumerate(recent_moves):
         if not move_line or ":" not in move_line:
             continue
@@ -148,7 +153,6 @@ def generate_last_moves():
         else:
             move_display = f"`{move_code}`"
         
-        # LINHA CRÍTICA: Markdown puro, sem tags HTML
         markdown += f"| {move_display} | `{algebraic}` | {create_link(author, 'https://github.com/' + author[1:])} |\n"
 
     return markdown + "\n"
