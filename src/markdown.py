@@ -107,37 +107,42 @@ def generate_last_moves():
         lines = file.readlines()
     
     # Filtrar apenas as jogadas (ignorar Start game)
-    jogadas = []
+    moves_lines = []
     for line in lines:
         if "Start game" not in line:
-            jogadas.append(line.strip())
+            moves_lines.append(line.strip())
+    
+    # moves_lines está na ordem: mais recente primeiro (f8d8, e1e3, ...)
     
     # Pegar as últimas N jogadas (as mais recentes)
     max_moves = settings['misc']['max_last_moves']
-    ultimas_jogadas = jogadas[-max_moves:]
+    recent_moves = moves_lines[:max_moves] if len(moves_lines) > max_moves else moves_lines
     
-    # Pegar as últimas N notações
-    ultimas_notacoes = algebraic_moves[-len(ultimas_jogadas):]
+    # CRIAR DICIONÁRIO: mapeia cada movimento para sua notação
+    move_to_algebraic = {}
     
-    # INVERTER as jogadas para mostrar mais recente primeiro
-    jogadas_invertidas = list(reversed(ultimas_jogadas))
+    # Inverter moves_lines para obter ordem cronológica (mais antigo primeiro)
+    chronological_moves = list(reversed(moves_lines))
     
-    # NÃO inverter as notações (manter ordem original)
-    notacoes_ordem = ultimas_notacoes
+    # Associar cada movimento à sua notação (na mesma ordem)
+    for i, move_line in enumerate(chronological_moves):
+        if i < len(algebraic_moves):
+            move_code = move_line.split(':')[0].strip()
+            move_to_algebraic[move_code] = algebraic_moves[i]
     
-    # Mostrar
-    for i in range(len(jogadas_invertidas)):
-        jogada = jogadas_invertidas[i]
-        notacao = notacoes_ordem[i] if i < len(notacoes_ordem) else "—"
-        
-        if ":" not in jogada:
+    # Mostrar os recent_moves na ordem (mais recente primeiro)
+    for move_line in recent_moves:
+        parts = move_line.split(':')
+        if len(parts) < 2:
             continue
-            
-        parts = jogada.split(':')
+        
         move_code = parts[0].strip()
         author = parts[1].strip()
         
-        # Formatar movimento
+        # Buscar a notação algébrica correspondente
+        algebraic = move_to_algebraic.get(move_code, "—")
+        
+        # Formatar movimento para exibição
         match_obj = re.search('([A-H][1-8])([A-H][1-8])', move_code, re.I)
         if match_obj:
             source = match_obj.group(1).upper()
@@ -146,8 +151,8 @@ def generate_last_moves():
         else:
             move_display = f"`{move_code}`"
         
-        markdown += f"| {move_display} | `{notacao}` | {create_link(author, 'https://github.com/' + author[1:])} |\n"
-    
+        markdown += f"| {move_display} | `{algebraic}` | {create_link(author, 'https://github.com/' + author[1:])} |\n"
+
     return markdown + "\n"
 
 def generate_moves_list(board):
