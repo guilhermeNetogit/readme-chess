@@ -63,6 +63,6 @@ markers:
 
 misc:
   # Maximum number of last moves displayed
-  max_last_moves: 50
+  max_last_moves: 10
   # Maximum number of top players displayed
   max_top_moves: 10
