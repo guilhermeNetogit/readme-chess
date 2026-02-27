@@ -119,21 +119,16 @@ def generate_last_moves():
     # Pegar as últimas N notações
     ultimas_notacoes = algebraic_moves[-len(ultimas_jogadas):]
     
-    # Criar pares (jogada, notacao) na ordem em que aparecem no jogo
-    pares = []
-    for i in range(len(ultimas_jogadas)):
-        pares.append({
-            'jogada': ultimas_jogadas[i],
-            'notacao': ultimas_notacoes[i]
-        })
+    # INVERTER as jogadas para mostrar mais recente primeiro
+    jogadas_invertidas = list(reversed(ultimas_jogadas))
     
-    # Inverter a ordem dos pares para mostrar do mais recente primeiro
-    pares.reverse()
+    # NÃO inverter as notações (manter ordem original)
+    notacoes_ordem = ultimas_notacoes
     
     # Mostrar
-    for par in pares:
-        jogada = par['jogada']
-        notacao = par['notacao']
+    for i in range(len(jogadas_invertidas)):
+        jogada = jogadas_invertidas[i]
+        notacao = notacoes_ordem[i] if i < len(notacoes_ordem) else "—"
         
         if ":" not in jogada:
             continue
