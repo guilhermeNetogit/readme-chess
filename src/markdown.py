@@ -95,7 +95,7 @@ def generate_last_moves():
     if not os.path.exists("data/last_moves.txt"):
         return "\n| Move | Algebraic Notation | Author |\n| :--: | :----------------: | :----- |\n| *Nenhum movimento ainda* | | |\n\n"
     
-    # Pegar notação algébrica do PGN
+    # Pegar notação algébrica do PGN (ordem: 1. c4, 1... d5, 2. cxd5, etc.)
     algebraic_moves = get_algebraic_notation()
     
     markdown = "\n"
@@ -116,42 +116,60 @@ def generate_last_moves():
         else:
             moves_lines.append(line)
     
-    # Pegar as últimas N jogadas (configurável)
+    # moves_lines está na ordem: mais recente primeiro (f8d8, e1e3, g7g8, ...)
+    
+    # Pegar as últimas N jogadas (as mais recentes)
     max_moves = settings['misc']['max_last_moves']
     
     # Se tiver Start game, reservamos espaço para ele
     if start_game_line:
-        max_moves = max_moves - 1
+        #max_moves = max_moves - 1
+        pass
+    # Pegar as primeiras N linhas (já que estão em ordem decrescente)
+    recent_moves = moves_lines[:max_moves] if len(moves_lines) > max_moves else moves_lines
     
-    # Pegar as últimas N jogadas
-    recent_moves = moves_lines[-max_moves:] if len(moves_lines) > max_moves else moves_lines
+    # AGORA: precisamos casar cada movimento com sua notação algébrica
+    # A notação algébrica está na ordem cronológica (mais antiga primeiro)
+    # Vamos criar um dicionário que mapeia cada movimento para sua notação
     
-    # Pegar as últimas N notações algébricas
-    recent_algebraic = algebraic_moves[-len(recent_moves):] if len(algebraic_moves) >= len(recent_moves) else algebraic_moves
+    move_to_algebraic = {}
     
-    # INVERTER a notação algébrica
-    recent_algebraic.reverse()
+    # Primeiro, vamos pegar todos os movimentos na ordem cronológica (do mais antigo para o mais novo)
+    # Para isso, invertemos o moves_lines
+    chronological_moves = list(reversed(moves_lines))
     
-    # Mostrar as jogadas
-    for i, move_line in enumerate(recent_moves):
+    # Agora associamos cada movimento à sua notação (na mesma ordem)
+    for i, move_line in enumerate(chronological_moves):
+        if i < len(algebraic_moves):
+            # Extrair apenas o movimento (ex: "f8d8") sem o autor
+            move_code = move_line.split(':')[0].strip()
+            move_to_algebraic[move_code] = algebraic_moves[i]
+    
+    # Agora mostramos os recent_moves na ordem (mais recente primeiro)
+    for move_line in recent_moves:
         parts = move_line.rstrip().split(':')
         
         if not ":" in move_line:
             continue
         
-        algebraic = recent_algebraic[i] if i < len(recent_algebraic) else "—"
+        move_code = parts[0].strip()
+        author = parts[1].strip()
+        
+        # Buscar a notação algébrica correspondente
+        algebraic = move_to_algebraic.get(move_code, "—")
         
         match_obj = re.search('([A-H][1-8])([A-H][1-8])', move_line, re.I)
         if match_obj is not None:
             source = match_obj.group(1).upper()
             dest   = match_obj.group(2).upper()
             move_display = f"`{source} to {dest}`"
-            markdown += f"| {move_display} | `{algebraic}` | {create_link(parts[1], 'https://github.com/' + parts[1].lstrip()[1:])} |\n"
+            markdown += f"| {move_display} | `{algebraic}` | {create_link(author, 'https://github.com/' + author[1:])} |\n"
     
     # Adicionar Start game no final (se existir)
     if start_game_line:
         parts = start_game_line.rstrip().split(':')
-        markdown += f"| `Start game` | — | {create_link(parts[1], 'https://github.com/' + parts[1].lstrip()[1:])} |\n"
+        author = parts[1].strip()
+        markdown += f"| `Start game` | — | {create_link(author, 'https://github.com/' + author[1:])} |\n"
 
     return markdown + "\n"
 
