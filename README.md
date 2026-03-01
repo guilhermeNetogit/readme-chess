@@ -44,7 +44,7 @@ Having fun? Ask a friend to do the next move!
 
 When you click on a link and submit a new issue with the desired move, a GitHub action is triggered, which in turn runs a small python script that performs the specified movement, updates this README file and commits the changes.
 
-Have you spotted a bug? Something missing? Feel free to open an [issue](https://github.com/marcizhu/readme-chess/issues) and I will try to fix it as soon as possible :D
+Have you spotted a bug? Something missing? Feel free to open an [issue](https://github.com/guilhermeNetogit/readme-chess/issues) and I will try to fix it as soon as possible :D
 
 
 <details>
@@ -88,7 +88,7 @@ Do you want to make your own? Check out on README below 👇🏼
 
 # GitHub README Chess Tournament
 
-This template repository contains the source code for a Python Chess bot, together with GitHub Workflows in order to allow ANYONE to play chess from a README file. Want to see this in action? Go to my [profile page](https://github.com/marcizhu) and feel free to try it out by yourself!
+This template repository contains the source code for a Python Chess bot, together with GitHub Workflows in order to allow ANYONE to play chess from a README file. Want to see this in action? Go to my [profile page](https://github.com/guilhermeNetogit) and feel free to try it out by yourself!
 
 
 ## Steps to make your own repo
