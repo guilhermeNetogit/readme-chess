@@ -408,6 +408,6 @@ def board_to_markdown(board):
     else:
         markdown += "_none_"
     
-    markdown += "#\n"
+    markdown += "\n"
 
     return markdown
