@@ -379,12 +379,6 @@ def board_to_markdown(board):
         columns = board_list[row - 1]
         if board.turn == chess.BLACK:
             columns = reversed(columns)
-
-    for row in rows:
-        markdown += "| **" + str(9 - row) + "** | "
-        columns = board_list[row - 1]
-        if board.turn == chess.BLACK:
-            columns = reversed(columns)
         for elem in columns:
             markdown += "<img src=\"{}\" width=45px> | ".format(images.get(elem, "???"))
         markdown += "**" + str(9 - row) + "** |\n"
@@ -393,6 +387,9 @@ def board_to_markdown(board):
         markdown += "|   | **H** | **G** | **F** | **E** | **D** | **C** | **B** | **A** |   |\n\n"
     else:
         markdown += "|   | **A** | **B** | **C** | **D** | **E** | **F** | **G** | **H** |   |\n\n"
+
+    return markdown
+
     
     # PEÇAS CAPTURADAS (em linha única abaixo)
     #markdown += "#\n"
