@@ -357,8 +357,7 @@ def board_to_markdown(board):
         "q": "img/black/queen.svg", "k": "img/black/king.svg", "p": "img/black/pawn.svg",
         "R": "img/white/rook.svg", "N": "img/white/knight.svg", "B": "img/white/bishop.svg",
         "Q": "img/white/queen.svg", "K": "img/white/king.svg", "P": "img/white/pawn.svg",
-        ".": "img/blank.png",
-        "_": "img/blank_dark.png"
+        ".": "img/blank.png"
     }
 
     # Get captured pieces
@@ -381,16 +380,13 @@ def board_to_markdown(board):
         if board.turn == chess.BLACK:
             columns = reversed(columns)
 
-        for col_idx, elem in enumerate(columns):
-            if elem == ".":
-                # Alternar entre claro e escuro
-                is_light = (row + col_idx) % 2 == 0
-                if is_light:
-                    markdown += "<img src=\"{}\" width=45px> | ".format(images["."])
-                else:
-                    markdown += "<img src=\"{}\" width=45px> | ".format(images["_"])
-            else:
-                markdown += "<img src=\"{}\" width=45px> | ".format(images.get(elem, "???"))
+    for row in rows:
+        markdown += "| **" + str(9 - row) + "** | "
+        columns = board_list[row - 1]
+        if board.turn == chess.BLACK:
+            columns = reversed(columns)
+        for elem in columns:
+            markdown += "<img src=\"{}\" width=45px> | ".format(images.get(elem, "???"))
         markdown += "**" + str(9 - row) + "** |\n"
 
     if board.turn == chess.BLACK:
