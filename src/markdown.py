@@ -395,7 +395,7 @@ def board_to_markdown(board):
             else:
                 markdown += "<img src=\"{}\" width=45px> | ".format(images.get(elem, "???"))
         
-        markdown += "**" + str(9 - row) + "** |\n"n"
+        markdown += "**" + str(9 - row) + "** |\n"
 
     if board.turn == chess.BLACK:
         markdown += "|   | **H** | **G** | **F** | **E** | **D** | **C** | **B** | **A** |   |\n\n"
