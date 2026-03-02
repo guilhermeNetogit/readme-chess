@@ -380,21 +380,17 @@ def board_to_markdown(board):
         columns = board_list[row - 1]
         if board.turn == chess.BLACK:
             columns = reversed(columns)
-        
+
         for col_idx, elem in enumerate(columns):
-            # Determinar se a casa é clara ou escura
-            # Em um tabuleiro, a soma da linha e coluna determina a cor
-            # row: 1-8, col_idx: 0-7
-            is_light = (row + col_idx) % 2 == 0  # Ajuste conforme sua preferência
-            
             if elem == ".":
+                # Alternar entre claro e escuro
+                is_light = (row + col_idx) % 2 == 0
                 if is_light:
                     markdown += "<img src=\"{}\" width=45px> | ".format(images["."])
                 else:
                     markdown += "<img src=\"{}\" width=45px> | ".format(images["_"])
             else:
                 markdown += "<img src=\"{}\" width=45px> | ".format(images.get(elem, "???"))
-        
         markdown += "**" + str(9 - row) + "** |\n"
 
     if board.turn == chess.BLACK:
