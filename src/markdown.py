@@ -102,10 +102,9 @@ def get_game_start_date():
     try:
         with open('games/current.pgn') as pgn_file:
             # Ler apenas as primeiras linhas (cabeçalhos)
-            for _ in range(10):  # Lê até 10 linhas para encontrar a data
+            for _ in range(10):
                 line = pgn_file.readline()
                 if line.startswith('[Date '):
-                    # Extrair a data entre aspas
                     match = re.search(r'"([^"]+)"', line)
                     if match:
                         return match.group(1)
@@ -118,7 +117,7 @@ def generate_last_moves():
     if not os.path.exists("data/last_moves.txt"):
         return "\n| Move | Algebraic Notation | Author |\n| :--: | :----------------: | :----- |\n| *Nenhum movimento ainda* | | |\n\n"
     
-    # Pegar notação algébrica do PGN
+    # Pegar notação algébrica do PGN (ordem: 1. c4, 1... d5, 2. cxd5, etc.)
     algebraic_moves = get_algebraic_notation()
     
     markdown = "\n"
@@ -129,35 +128,50 @@ def generate_last_moves():
     with open("data/last_moves.txt", 'r') as file:
         lines = file.readlines()
     
-    # Filtrar apenas as jogadas (ignorar Start game)
+    # Separar Start game das jogadas
+    start_game_line = None
     moves_lines = []
-    for line in lines:
-        if "Start game" not in line:
-            moves_lines.append(line.strip())
     
-    # moves_lines está na ordem: mais recente primeiro (f8d8, e1e3, ...)
+    for line in lines:
+        if "Start game" in line:
+            start_game_line = line
+        else:
+            moves_lines.append(line)
+    
+    # moves_lines está na ordem: mais recente primeiro (f8d8, e1e3, g7g8, ...)
     
     # Pegar as últimas N jogadas (as mais recentes)
     max_moves = settings['misc']['max_last_moves']
-
+    
+    # Se tiver Start game, reservamos espaço para ele
+    if start_game_line:
+        max_moves = max_moves - 1
+    
+    # Pegar as primeiras N linhas (já que estão em ordem decrescente)
     recent_moves = moves_lines[:max_moves] if len(moves_lines) > max_moves else moves_lines
     
-    # CRIAR DICIONÁRIO: mapeia cada movimento para sua notação
+    # AGORA: precisamos casar cada movimento com sua notação algébrica
+    # A notação algébrica está na ordem cronológica (mais antiga primeiro)
+    # Vamos criar um dicionário que mapeia cada movimento para sua notação
+    
     move_to_algebraic = {}
     
-    # Inverter moves_lines para obter ordem cronológica (mais antigo primeiro)
+    # Primeiro, vamos pegar todos os movimentos na ordem cronológica (do mais antigo para o mais novo)
+    # Para isso, invertemos o moves_lines
     chronological_moves = list(reversed(moves_lines))
     
-    # Associar cada movimento à sua notação (na mesma ordem)
+    # Agora associamos cada movimento à sua notação (na mesma ordem)
     for i, move_line in enumerate(chronological_moves):
         if i < len(algebraic_moves):
+            # Extrair apenas o movimento (ex: "f8d8") sem o autor
             move_code = move_line.split(':')[0].strip()
             move_to_algebraic[move_code] = algebraic_moves[i]
     
-    # Mostrar os recent_moves na ordem (mais recente primeiro)
+    # Agora mostramos os recent_moves na ordem (mais recente primeiro)
     for move_line in recent_moves:
-        parts = move_line.split(':')
-        if len(parts) < 2:
+        parts = move_line.rstrip().split(':')
+        
+        if not ":" in move_line:
             continue
         
         move_code = parts[0].strip()
@@ -166,42 +180,26 @@ def generate_last_moves():
         # Buscar a notação algébrica correspondente
         algebraic = move_to_algebraic.get(move_code, "—")
         
-        # Formatar movimento para exibição
-        match_obj = re.search('([A-H][1-8])([A-H][1-8])', move_code, re.I)
-        if match_obj:
+        match_obj = re.search('([A-H][1-8])([A-H][1-8])', move_line, re.I)
+        if match_obj is not None:
             source = match_obj.group(1).upper()
-            dest = match_obj.group(2).upper()
+            dest   = match_obj.group(2).upper()
             move_display = f"`{source} to {dest}`"
-        else:
-            move_display = f"`{move_code}`"
-        
-        markdown += f"| {move_display} | `{algebraic}` | {create_link(author, 'https://github.com/' + author[1:])} |\n"
-
-        # Adicionar Start game no final com a data
-        # Procurar a linha do Start game no arquivo original
-        with open("data/last_moves.txt", 'r') as file:
-            all_lines = file.readlines()
+            markdown += f"| {move_display} | `{algebraic}` | {create_link(author, 'https://github.com/' + author[1:])} |\n"
     
-    start_game_line = None
-    for line in all_lines:
-        if "Start game" in line:
-            start_game_line = line.strip()
-            break
-    
+        # Adicionar Start game no final (se existir)
     if start_game_line:
-        parts = start_game_line.split(':')
-        if len(parts) >= 2:
-            author = parts[1].strip()
-            
-            # Pegar a data do início do jogo
-            start_date = get_game_start_date()
-            if start_date:
-                date_display = f"{start_date}"
-            else:
-                date_display = "—"
-            
-            markdown += f"| `Start game` | `{date_display}` | {create_link(author, 'https://github.com/' + author[1:])} |\n"
-
+        parts = start_game_line.rstrip().split(':')
+        author = parts[1].strip()
+        
+        # Pegar a data do início do jogo
+        start_date = get_game_start_date()
+        if start_date:
+            date_display = f"{start_date}"
+        else:
+            date_display = "—"
+        
+        markdown += f"| `Start game` | `{date_display}` | {create_link(author, 'https://github.com/' + author[1:])} |\n"
     return markdown + "\n"
 
 def generate_moves_list(board):
@@ -221,7 +219,7 @@ def generate_moves_list(board):
         issue_link = settings['issues']['link'].format(
             repo=os.environ["GITHUB_REPOSITORY"],
             params=urlencode(settings['issues']['new_game']))
-        
+
         # Determinar o resultado da partida
         result = board.result()
         if result == "1-0":
@@ -319,12 +317,12 @@ def captured_pieces_to_markdown(board):
     captured = get_captured_pieces(board)
     
     markdown = '\n<div align="center">\n\n'
-    markdown += '### ⚔️ Peças Capturadas\n\n'
+    markdown += '### ⚔️ Captured Pieces\n\n'
     
     # Peças capturadas pelas pretas (lado esquerdo - visão das pretas)
     markdown += '<table>\n'
     markdown += '  <tr>\n'
-    markdown += '    <td width="200" align="center"><strong>⚫ Pretas capturaram</strong><br>'
+    markdown += '    <td width="200" align="center"><strong>⚫ Black captured</strong><br>'
     for svg_path in captured['black_captured']:
         markdown += f'<img src="{svg_path}" width=30px> '
         
@@ -332,7 +330,7 @@ def captured_pieces_to_markdown(board):
     
     # Peças capturadas pelas brancas (lado direito - visão das brancas)
     markdown += '    <td valign="middle" align="center" width="100">\n'
-    markdown += '      <strong>⚪ Brancas capturaram</strong><br>\n'
+    markdown += '      <strong>⚪ White captured</strong><br>\n'
     
     # Adicionar as imagens das peças capturadas pelas brancas
     if captured['white_captured']:
@@ -387,31 +385,28 @@ def board_to_markdown(board):
         markdown += "|   | **H** | **G** | **F** | **E** | **D** | **C** | **B** | **A** |   |\n\n"
     else:
         markdown += "|   | **A** | **B** | **C** | **D** | **E** | **F** | **G** | **H** |   |\n\n"
-
-    return markdown
-
     
     # PEÇAS CAPTURADAS (em linha única abaixo)
-    #markdown += "#\n"
-    markdown += "### ⚔️ Peças Capturadas\n"
+    markdown += "#\n"
+    markdown += "### ⚔️ Captured Pieces\n"
     
     # Brancas capturaram (peças pretas)
-    markdown += "**⚪ Brancas:** "
+    markdown += "**⚪ White:** "
     if captured['white_captured']:
         for svg_path in captured['white_captured']:
             markdown += f'<img src="{svg_path}" width=22px> '
     else:
-        markdown += "_nenhuma_"
+        markdown += "_none_"
     
     markdown += " &nbsp; | &nbsp; "
     
     # Pretas capturaram (peças brancas)
-    markdown += "**⚫ Pretas:** "
+    markdown += "**⚫ Black:** "
     if captured['black_captured']:
         for svg_path in captured['black_captured']:
             markdown += f'<img src="{svg_path}" width=22px> '
     else:
-        markdown += "_nenhuma_"
+        markdown += "_none_"
     
     markdown += "\n"
 
