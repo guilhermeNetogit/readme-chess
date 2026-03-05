@@ -169,8 +169,8 @@ def generate_scoreboard():
     markdown += f"| ⚫ Black | {stats['black_wins']} | {stats['white_wins']} | {stats['draws']} | {total} |\n\n"
     
     # Barra de progresso simples
-    markdown += f"⚪ White: {'█' * int(white_percent/5)}{'░' * (20 - int(white_percent/5))} {white_percent:.1f}%\n"
-    markdown += f"⚫ Black: {'█' * int(black_percent/5)}{'░' * (20 - int(black_percent/5))} {black_percent:.1f}%\n"
+    markdown += f"⚪ White: {'█' * int(white_percent/5)}{'░' * (20 - int(white_percent/5))} {white_percent:.1f}%\n\n"
+    markdown += f"⚫ Black: {'█' * int(black_percent/5)}{'░' * (20 - int(black_percent/5))} {black_percent:.1f}%\n\n"
     markdown += f"⚖️ Draws: {draw_percent:.1f}%\n"
     
     return markdown
