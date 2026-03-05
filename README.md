@@ -71,6 +71,9 @@ Have you spotted a bug? Something missing? Feel free to open an [issue](https://
 <!-- END TOP MOVES -->
 </details>
 
+<!-- BEGIN SCOREBOARD -->
+<!-- END SCOREBOARD -->
+
 #
 Do you want to make your own? Check out on README below 👇🏼
 #
