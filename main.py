@@ -214,8 +214,9 @@ def main(issue, issue_author, repo_owner):
             moves_list=markdown.generate_moves_list(gameboard),
             turn=('white' if gameboard.turn == chess.WHITE else 'black'),
             last_moves=last_moves,
-            top_moves=markdown.generate_top_moves()))
-            scoreboard=markdown.generate_scoreboard()))
+            top_moves=markdown.generate_top_moves(),
+            scoreboard=markdown.generate_scoreboard()
+        ))
 
     return True, ''
 
