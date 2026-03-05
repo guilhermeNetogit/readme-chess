@@ -57,6 +57,9 @@ markers:
   top_moves:
     begin: "<!-- BEGIN TOP MOVES -->\n"
     end: "<!-- END TOP MOVES -->\n"
+  scoreboard:
+    begin: "<!-- BEGIN SCOREBOARD -->"
+    end: "<!-- END SCOREBOARD -->"
   turn:
     begin: "<!-- BEGIN TURN -->"
     end: "<!-- END TURN -->"
