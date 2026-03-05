@@ -20,7 +20,7 @@ It's your turn to play! Move a <!-- BEGIN TURN -->black<!-- END TURN --> piece.
 ### ⚔️ Captured Pieces
 **⚪ White:** <img src="img/black/pawn.svg" width=22px> <img src="img/black/pawn.svg" width=22px> <img src="img/black/pawn.svg" width=22px> <img src="img/black/pawn.svg" width=22px> <img src="img/black/pawn.svg" width=22px> <img src="img/black/pawn.svg" width=22px> <img src="img/black/knight.svg" width=22px> <img src="img/black/bishop.svg" width=22px> <img src="img/black/bishop.svg" width=22px> <img src="img/black/rook.svg" width=22px> <img src="img/black/rook.svg" width=22px> <img src="img/black/queen.svg" width=22px>  &nbsp; | &nbsp; **⚫ Black:** <img src="img/white/pawn.svg" width=22px> <img src="img/white/pawn.svg" width=22px> <img src="img/white/pawn.svg" width=22px> <img src="img/white/pawn.svg" width=22px> <img src="img/white/pawn.svg" width=22px> <img src="img/white/pawn.svg" width=22px> <img src="img/white/pawn.svg" width=22px> <img src="img/white/knight.svg" width=22px> <img src="img/white/knight.svg" width=22px> <img src="img/white/bishop.svg" width=22px> <img src="img/white/bishop.svg" width=22px> <img src="img/white/rook.svg" width=22px> <img src="img/white/rook.svg" width=22px> <img src="img/white/queen.svg" width=22px> 
 <!-- END CHESS BOARD -->
-
+#
 **It's your turn to move! Choose one from the following table**
 <!-- BEGIN MOVES LIST -->
 |  FROM  | TO (Just click a link!) |
@@ -71,11 +71,9 @@ Have you spotted a bug? Something missing? Feel free to open an [issue](https://
 <!-- END TOP MOVES -->
 </details>
 
----
-
+#
 Do you want to make your own? Check out on README below 👇🏼
-
----
+#
 
 # GitHub README Chess Tournament
 
