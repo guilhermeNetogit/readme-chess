@@ -1,1 +1,1 @@
-{'@guilhermeNetogit': 60, '@arauj0duy': 59}
+{'@guilhermeNetogit': 60, '@arauj0duy': 60}
