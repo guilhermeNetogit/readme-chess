@@ -63,7 +63,7 @@ markers:
   turn:
     begin: "<!-- BEGIN TURN -->\n"
     end: "<!-- END TURN -->\n"
-
+  
 misc:
   # Maximum number of last moves displayed
   max_last_moves: 10
