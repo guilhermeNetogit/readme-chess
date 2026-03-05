@@ -206,6 +206,7 @@ def main(issue, issue_author, repo_owner):
         readme = replace_text_between(readme, settings['markers']['turn'], '{turn}')
         readme = replace_text_between(readme, settings['markers']['last_moves'], '{last_moves}')
         readme = replace_text_between(readme, settings['markers']['top_moves'], '{top_moves}')
+        readme = replace_text_between(readme, settings['markers']['scoreboard'], '{scoreboard}')
 
     with open('README.md', 'w') as file:
         # Write new board & list of movements
