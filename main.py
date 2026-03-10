@@ -215,7 +215,7 @@ def main(issue, issue_author, repo_owner):
     if not gameboard.is_game_over():
         scoreboard_display = f"<details>\n<summary>🏆 Scoreboard</summary>\n\n{scoreboard_content}\n\n</details>\n"
     else:
-        scoreboard_display = scoreboard_content
+        scoreboard_display = f"### 🏆 Scoreboard\n\n{scoreboard_content}"
 
     with open('README.md', 'w') as file:
         # Write new board & list of movements

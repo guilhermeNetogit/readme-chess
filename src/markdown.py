@@ -156,13 +156,13 @@ def generate_scoreboard():
     total = stats['white_wins'] + stats['black_wins'] + stats['draws']
     
     if total == 0:
-        return "\n### 🏆 Scoreboard\n\nNo games played yet.\n"
+        return "No games played yet.\n"
     
     white_percent = (stats['white_wins'] / total) * 100 if total > 0 else 0
     black_percent = (stats['black_wins'] / total) * 100 if total > 0 else 0
     draw_percent = (stats['draws'] / total) * 100 if total > 0 else 0
     
-    markdown = "\n### 🏆 Scoreboard\n\n"
+    # markdown = "\n### 🏆 Scoreboard\n\n"
     markdown += "| Color | Wins | Losses | Draws | Total |\n"
     markdown += "|:-----:|-----:|-------:|------:|------:|\n"
     markdown += f"| ⚪ White | {stats['white_wins']} | {stats['black_wins']} | {stats['draws']} | {total} |\n"
