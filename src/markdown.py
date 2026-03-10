@@ -113,6 +113,68 @@ def get_game_start_date():
         print(f"Erro ao ler data do PGN: {e}")
         return None
 
+def load_stats():
+    """Carrega as estatísticas do arquivo"""
+    if not os.path.exists("data/stats.txt"):
+        return {'white_wins': 0, 'black_wins': 0, 'draws': 0}
+    
+    stats = {'white_wins': 0, 'black_wins': 0, 'draws': 0}
+    try:
+        with open("data/stats.txt", 'r') as f:
+            for line in f:
+                if ':' in line:
+                    key, value = line.strip().split(':')
+                    if key in stats:
+                        stats[key] = int(value)
+    except:
+        pass
+    return stats
+
+def save_stats(stats):
+    """Salva as estatísticas no arquivo"""
+    with open("data/stats.txt", 'w') as f:
+        for key, value in stats.items():
+            f.write(f"{key}:{value}\n")
+
+def update_stats(result):
+    """Atualiza estatísticas com base no resultado da partida"""
+    stats = load_stats()
+    
+    if result == "1-0":
+        stats['white_wins'] += 1
+    elif result == "0-1":
+        stats['black_wins'] += 1
+    elif result == "1/2-1/2":
+        stats['draws'] += 1
+    
+    save_stats(stats)
+    return stats
+
+def generate_scoreboard():
+    """Gera o placar em Markdown"""
+    stats = load_stats()
+    total = stats['white_wins'] + stats['black_wins'] + stats['draws']
+    
+    if total == 0:
+        return "\n### 🏆 Scoreboard\n\nNo games played yet.\n"
+    
+    white_percent = (stats['white_wins'] / total) * 100 if total > 0 else 0
+    black_percent = (stats['black_wins'] / total) * 100 if total > 0 else 0
+    draw_percent = (stats['draws'] / total) * 100 if total > 0 else 0
+    
+    markdown = "\n### 🏆 Scoreboard\n\n"
+    markdown += "| Color | Wins | Losses | Draws | Total |\n"
+    markdown += "|:-----:|-----:|-------:|------:|------:|\n"
+    markdown += f"| ⚪ White | {stats['white_wins']} | {stats['black_wins']} | {stats['draws']} | {total} |\n"
+    markdown += f"| ⚫ Black | {stats['black_wins']} | {stats['white_wins']} | {stats['draws']} | {total} |\n\n"
+    
+    # Barra de progresso simples
+    markdown += f"⚪ White: {'█' * int(white_percent/5)}{'░' * (20 - int(white_percent/5))} {white_percent:.1f}%\n\n"
+    markdown += f"⚫ Black: {'█' * int(black_percent/5)}{'░' * (20 - int(black_percent/5))} {black_percent:.1f}%\n\n"
+    markdown += f"⚖️ Draws: {draw_percent:.1f}%\n"
+    
+    return markdown
+
 def generate_last_moves():
     if not os.path.exists("data/last_moves.txt"):
         return "\n| Move | Algebraic Notation | Author |\n| :--: | :----------------: | :----- |\n| *Nenhum movimento ainda* | | |\n\n"

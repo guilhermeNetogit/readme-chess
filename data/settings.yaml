@@ -57,10 +57,13 @@ markers:
   top_moves:
     begin: "<!-- BEGIN TOP MOVES -->\n"
     end: "<!-- END TOP MOVES -->\n"
+  scoreboard:
+    begin: "<!-- BEGIN SCOREBOARD -->\n"
+    end: "<!-- END SCOREBOARD -->\n"
   turn:
-    begin: "<!-- BEGIN TURN -->"
-    end: "<!-- END TURN -->"
-
+    begin: "<!-- BEGIN TURN -->\n"
+    end: "<!-- END TURN -->\n"
+  
 misc:
   # Maximum number of last moves displayed
   max_last_moves: 10
