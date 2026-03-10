@@ -203,6 +203,16 @@ def main(issue, issue_author, repo_owner):
         readme = replace_text_between(readme, settings['markers']['turn'], '{turn}')
         readme = replace_text_between(readme, settings['markers']['last_moves'], '{last_moves}')
         readme = replace_text_between(readme, settings['markers']['top_moves'], '{top_moves}')
+        readme = replace_text_between(readme, settings['markers']['scoreboard'], '{scoreboard}')
+
+    # Generate scoreboard content
+    scoreboard_content = markdown.generate_scoreboard()
+
+    # Decide whether to display in a dropdown or not
+    if not gameboard.is_game_over():
+        scoreboard_display = f"<details>\n<summary>🏆 Scoreboard</summary>\n\n{scoreboard_content}\n\n</details>\n"
+    else:
+        scoreboard_display = scoreboard_content
 
     with open('README.md', 'w') as file:
         # Write new board & list of movements
@@ -211,7 +221,8 @@ def main(issue, issue_author, repo_owner):
             moves_list=markdown.generate_moves_list(gameboard),
             turn=('white' if gameboard.turn == chess.WHITE else 'black'),
             last_moves=last_moves,
-            top_moves=markdown.generate_top_moves()))
+            top_moves=markdown.generate_top_moves(),
+            scoreboard=scoreboard_display))
 
     return True, ''
 
